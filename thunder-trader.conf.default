@@ -1,0 +1,24 @@
+{
+    "basic": {
+        "address": "0.0.0.0",
+        "listenport": "8800",
+        "nethandlerthreadcount": "2",
+        "strategypath": "/usr/local/bin/strategies"
+    },
+    "logconfig": {
+    "logtype": "syslog|file|console",
+        "syslog": {
+            "serveraddress": "127.0.0.1",
+            "port": "514"
+        },
+        "file": {
+        "target": "ATMLOG",
+            "filenamehead": "atm_log_",
+            "rotationsize": "1048576",
+            "autoflush": "true"
+        },
+        "console": {
+        }
+    }
+}
+
