@@ -585,6 +585,10 @@ void CCTP_FUTURE_MDPlugin::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *
 	boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//¶ÁËø
 	auto & InstrumentNode = m_mapInsid2Strategys[pDepthMarketData->InstrumentID];
 	auto & tick = InstrumentNode.first;
+	ShowMessage(severity_levels::normal,
+			"...OnRtnDepthMarketData,InstrumentID:%s",
+			pSpecificInstrument->InstrumentID);
+
 	try {
 		strncpy(tick.m_strInstrumentID, pDepthMarketData->InstrumentID, sizeof(tick.m_strInstrumentID));
 		tick.m_intVolume = pDepthMarketData->Volume;
