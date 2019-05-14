@@ -1,0 +1,2 @@
+/usr/bin/ar qc libautopend.a  CMakeFiles/autopend.dir/common/AutoPend.o
+/usr/bin/ranlib libautopend.a

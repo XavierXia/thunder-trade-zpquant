@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdfitc_sop_tdplugin.a  CMakeFiles/dfitc_sop_tdplugin.dir/trade/trade_plugins/DFITC_SOP_TDPlugin/DFITC_SOP_TDPlugin.o
+/usr/bin/ranlib libdfitc_sop_tdplugin.a

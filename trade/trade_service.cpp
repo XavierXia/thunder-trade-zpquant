@@ -545,6 +545,11 @@ void CTradeService::CancelStrategy(unsigned int StrategyID, string & sarchive, p
 }
 
 
+/*
+{"type":"reqdeploynewstrategy","bin":"strategy_simple_strategy","archive":"","comment":"",
+"param":{"a":"5","b":"0.200000","c":"2","aa":"5","bb":"0.200000","cc":"2"},
+"dataid":{"0":{"symboldefine":{"type":"future","instrumentid":"CF903","exchangeid":"CZCE"},"marketdatasource":"ctp_md&120842&9999","tradesource":"ctp_td&120842&9999"}}}
+*/
 void CTradeService::OnCommunicate(const ptree & in, ptree & out)
 {
     if (in.find("type") != in.not_found())
@@ -686,6 +691,7 @@ void CTradeService::ReqAddSource(PackageHandlerParamType param, const ptree & in
             );
             if (FindResult!=tarContainer->first.end())
             {
+                ShowMessage(severity_levels::error,"...689 ReqAddSource,trade_service.cpp");
                 if (PackageHandlerParamType::MarketData == param)
                 {
                     MAtmMarketDataPluginInterface * mdObjectPlugin
@@ -727,6 +733,7 @@ void CTradeService::ReqAddSource(PackageHandlerParamType param, const ptree & in
             }
             else
             {
+                ShowMessage(severity_levels::error,"...731 ReqAddSource,trade_service.cpp");
                 if (PackageHandlerParamType::MarketData == param)
                 {
                     MAtmMarketDataPluginInterface * mdObjectPlugin
