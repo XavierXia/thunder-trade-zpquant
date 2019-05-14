@@ -1,0 +1,8 @@
+/usr/local/lib/libthostmduserapi.so
+/usr/local/lib/libthosttraderapi.so
+/usr/local/lib/libDFITCSECMdApi.so
+/usr/local/lib/libDFITCSECTraderApi.so
+/usr/local/bin/thunder-trader
+/usr/local/bin/thunder-trader.conf
+/usr/local/bin/strategies/strategy_arbitrage_future.so
+/usr/local/bin/strategies/strategy_simple_strategy.so

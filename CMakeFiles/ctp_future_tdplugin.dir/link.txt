@@ -1,0 +1,2 @@
+/usr/bin/ar qc libctp_future_tdplugin.a  CMakeFiles/ctp_future_tdplugin.dir/trade/trade_plugins/CTP_FUTURE_TDPlugin/CTP_FUTURE_TDPlugin.o
+/usr/bin/ranlib libctp_future_tdplugin.a
