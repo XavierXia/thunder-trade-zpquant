@@ -80,6 +80,10 @@ public:
 		boost::shared_mutex &);
 	virtual void MDDetachStrategy(MStrategy*/*IN*/);
 
+	bool IsPedding();
+	virtual void MDHotUpdate(const ptree &);
+	virtual void Pause();
+	virtual void Continue();
 public:
 	void MDDestoryAll();
 	BOOL MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
