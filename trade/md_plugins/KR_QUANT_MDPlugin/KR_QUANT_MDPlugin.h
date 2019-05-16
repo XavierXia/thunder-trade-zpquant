@@ -14,10 +14,10 @@
 #include <boost/log/common.hpp>
 
 
-#include "Kr360Quant/include/mds_api/mds_api.h"
-#include "Kr360Quant/include/mds_api/parser/mds_protocol_parser.h"
-#include "Kr360Quant/include/mds_api/parser/json_parser/mds_json_parser.h"
-#include "Kr360Quant/include/sutil/logger/spk_log.h"
+#include "mds_api/mds_api.h"
+#include "mds_api/parser/mds_protocol_parser.h"
+#include "mds_api/parser/json_parser/mds_json_parser.h"
+#include "sutil/logger/spk_log.h"
 
 #include "SeverityLevel.h"
 #include "FutureTick.h"
