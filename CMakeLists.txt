@@ -134,10 +134,6 @@ endif (FEMAS_FUTURE_TDPlugin)
 
     ####################### KR_QUANT ##########################################
 include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/")
-#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/")
-#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/parser/")
-#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/parser/json_parser/")
-#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/sutil/logger/")
 link_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/")
     
 if (KR_QUANT_MDPlugin)

@@ -5,6 +5,7 @@
 
 const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 extern char ProcessName[256];
+char CKrQuantMDPluginImp::THE_CONFIG_FILE_NAME[]="/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
 
 CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
 {
@@ -64,9 +65,6 @@ string CKrQuantMDPluginImp::GetProspectiveKeyword(const ptree & in)
 	auto temp = in.find("username");
 	if (temp != in.not_found())
 	{
-
-		if (temp->second.data().size()>(sizeof(CThostFtdcReqUserLoginField::UserID) - 1))
-			throw std::exception("kr_mds:username is too long");
 		retKey += temp->second.data();
 	}
 	else
@@ -81,19 +79,16 @@ void CKrQuantMDPluginImp::GetState(ptree & out)
 		out.put("online","true");
 	else
 		out.put("online", "false");
-	out.put("serveraddress", m_strServerAddress);
-	out.put("brokerid", m_strBrokerID);
 	out.put("username", m_strUsername);
 }
 
 void CKrQuantMDPluginImp::MDInit(const ptree & in)
 {
 	//读取配置
-	THE_CONFIG_FILE_NAME = "mds_client.conf";
     cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
 
 	m_StartAndStopCtrlTimer.expires_from_now(time_duration(0,0,3,0));
-	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CMDPluginImp::TimerHandler,this));
+	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CKrQuantMDPluginImp::TimerHandler,this));
 	m_futTimerThreadFuture=std::async([this] {
 		this->m_IOservice.run();
 		return true;
@@ -134,7 +129,7 @@ void CKrQuantMDPluginImp::TimerHandler()
 		nextActiveTime = ptime(second_clock::universal_time().date()+days(1), time_duration(0, 0, 30, 0));
 	}
 	m_StartAndStopCtrlTimer.expires_at(nextActiveTime);
-	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CMDPluginImp::TimerHandler, this));
+	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CKrQuantMDPluginImp::TimerHandler, this));
 	ShowMessage(normal, "%s: Next:%s", GetCurrentKeyword().c_str(), to_simple_string(nextActiveTime).c_str());
 }
 
@@ -378,7 +373,7 @@ BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChan
  * @param   pCallbackParams 外部传入的参数
  * @return  大于等于0，成功；小于0，失败（错误号）
  */
-static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+static int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
 
