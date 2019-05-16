@@ -111,7 +111,7 @@ if (DFITC_SOP_TDPlugin)
 endif (DFITC_SOP_TDPlugin)
 
     ####################### FEMAS ##########################################
-include_directories("${PROJECT_SOURCE_DIR}third/Femas/")
+include_directories("${PROJECT_SOURCE_DIR}/third/Femas/")
 link_directories("${PROJECT_SOURCE_DIR}/third/Femas/")
     
 if (FEMAS_FUTURE_MDPlugin)
@@ -133,11 +133,11 @@ if (FEMAS_FUTURE_TDPlugin)
 endif (FEMAS_FUTURE_TDPlugin)
 
     ####################### KR_QUANT ##########################################
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/")
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/mds_api/")
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/mds_api/parser/")
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/mds_api/parser/json_parser/")
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/sutil/logger/")
+include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/")
+#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/")
+#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/parser/")
+#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/mds_api/parser/json_parser/")
+#include_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/include/sutil/logger/")
 link_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/")
     
 if (KR_QUANT_MDPlugin)
@@ -145,7 +145,7 @@ if (KR_QUANT_MDPlugin)
     set(kr_quant_mdplugpath "${PROJECT_SOURCE_DIR}/trade/md_plugins/KR_QUANT_MDPlugin")
     include_directories("${kr_quant_mdplugpath}")
     add_library(kr_quant_mdplugin STATIC ${kr_quant_mdplugpath}/KR_QUANT_MDPlugin.cpp)
-    target_link_libraries(kr_quant_mdplugin ${libs} "${PROJECT_SOURCE_DIR}third/Kr360Quant/linux64/liboes_api.so")
+    target_link_libraries(kr_quant_mdplugin ${libs} "${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/liboes_api.so")
     install(FILES "${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/liboes_api.so" DESTINATION lib)
 endif (KR_QUANT_MDPlugin)
 
