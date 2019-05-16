@@ -137,7 +137,7 @@ include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/")
 link_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/")
     
 if (KR_QUANT_MDPlugin)
-    add_definitions(-KR_QUANT_MDPlugin) 
+    add_definitions(-DKR_QUANT_MDPlugin) 
     set(kr_quant_mdplugpath "${PROJECT_SOURCE_DIR}/trade/md_plugins/KR_QUANT_MDPlugin")
     include_directories("${kr_quant_mdplugpath}")
     add_library(kr_quant_mdplugin STATIC ${kr_quant_mdplugpath}/KR_QUANT_MDPlugin.cpp)
