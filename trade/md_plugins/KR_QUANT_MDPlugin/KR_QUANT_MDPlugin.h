@@ -55,7 +55,6 @@ class CKrQuantMDPluginImp:
 	unordered_map<string, pair<CFutureTick,list< tuple < MStrategy*, TMarketDataIdType, boost::shared_mutex*> > > > m_mapInsid2Strategys;
 	unordered_map< MStrategy*, list<string> > m_mapStrategy2Insids;
 
-	const char*   THE_CONFIG_FILE_NAME;
 	MdsApiClientEnvT    cliEnv;
 
 public:
@@ -86,8 +85,6 @@ public:
 	BOOL MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
         const char *pCodeListString);
 	void OnWaitOnMsg();
-	static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
-        SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 private:
 	bool Start();
