@@ -5,7 +5,7 @@
 
 const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 extern char ProcessName[256];
-char CKrQuantMDPluginImp::THE_CONFIG_FILE_NAME[]="/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
+const char CKrQuantMDPluginImp::THE_CONFIG_FILE_NAME[]="/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
 
 CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
 {
@@ -68,7 +68,7 @@ string CKrQuantMDPluginImp::GetProspectiveKeyword(const ptree & in)
 		retKey += temp->second.data();
 	}
 	else
-		throw std::exception("kr_mds:can not find <username>");
+		throw std::runtime_error("kr_mds:can not find <username>");
 
 	return retKey;
 }
@@ -464,6 +464,7 @@ static int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT
 
 void CKrQuantMDPluginImp::OnWaitOnMsg()
 {
+	static const int32  THE_TIMEOUT_MS = 1000;
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
             MdsApi_OnRtnDepthMarketData, NULL);

@@ -83,10 +83,10 @@ public:
 
 public:
 	void MDDestoryAll();
-	BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
+	BOOL MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
         const char *pCodeListString);
 	void OnWaitOnMsg();
-	static int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+	static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 private:
