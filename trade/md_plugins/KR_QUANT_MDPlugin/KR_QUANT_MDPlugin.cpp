@@ -15,7 +15,7 @@ CKrQuantMDPluginImp::~CKrQuantMDPluginImp()
 {
 }
 
-bool CCTP_FUTURE_MDPlugin::IsPedding()
+bool CKrQuantMDPluginImp::IsPedding()
 {
 	return m_abIsPending.load();
 }
@@ -99,7 +99,7 @@ void CKrQuantMDPluginImp::MDInit(const ptree & in)
 	});
 }
 
-void CCTP_FUTURE_MDPlugin::MDHotUpdate(const ptree & NewConfig)
+void CKrQuantMDPluginImp::MDHotUpdate(const ptree & NewConfig)
 {
 	MDUnload();
 	m_IOservice.reset();
@@ -201,12 +201,12 @@ void CKrQuantMDPluginImp::MDUnload()
 	m_futTimerThreadFuture.get();
 }
 
-void CCTP_FUTURE_MDPlugin::Pause()
+void CKrQuantMDPluginImp::Pause()
 {
 	m_adbIsPauseed.store(true);
 }
 
-void CCTP_FUTURE_MDPlugin::Continue()
+void CKrQuantMDPluginImp::Continue()
 {
 	m_adbIsPauseed.store(false);
 }
