@@ -587,7 +587,7 @@ void CCTP_FUTURE_MDPlugin::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *
 	auto & tick = InstrumentNode.first;
 	ShowMessage(severity_levels::normal,
 			"...OnRtnDepthMarketData,InstrumentID:%s",
-			pSpecificInstrument->InstrumentID);
+			pDepthMarketData->InstrumentID);
 
 	try {
 		strncpy(tick.m_strInstrumentID, pDepthMarketData->InstrumentID, sizeof(tick.m_strInstrumentID));

@@ -133,7 +133,7 @@ if (FEMAS_FUTURE_TDPlugin)
 endif (FEMAS_FUTURE_TDPlugin)
 
     ####################### KR_QUANT ##########################################
-include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/")
+include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/")
 link_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/")
     
 if (KR_QUANT_MDPlugin)
