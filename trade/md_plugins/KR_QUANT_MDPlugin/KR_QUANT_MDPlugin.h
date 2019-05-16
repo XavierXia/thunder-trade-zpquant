@@ -1,5 +1,5 @@
-#ifndef 
-#define 
+#ifndef QFCOMPRETRADESYSTEM_ATMMARKETDATAPLUGINS_KR_QUANT_MDPLUGIN_H
+#define QFCOMPRETRADESYSTEM_ATMMARKETDATAPLUGINS_KR_QUANT_MDPLUGIN_H
 #include <string>
 #include <boost/thread.hpp>
 #include <thread>                // std::thread

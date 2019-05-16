@@ -1,7 +1,10 @@
 #include "KR_QUANT_MDPlugin.h"
 #include <stdarg.h>
 #include <thread>
+#include "AutoPend.h"
+
 const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
+extern char ProcessName[256];
 
 CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
 {
