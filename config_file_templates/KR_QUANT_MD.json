@@ -1,4 +1,5 @@
 {
     "type": "reqaddmarketdatasource",
-    "sourcetype": "kr360"
+    "sourcetype": "kr360",
+    "username": "120842"
 }

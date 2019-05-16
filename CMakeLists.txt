@@ -54,11 +54,14 @@ link_directories(${Boost_LIBRARY_DIRS})
 option (CTP_FUTURE_MDPlugin "Support CTP quotation" ON) 
 option (CTP_FUTURE_TDPlugin "Support CTP trade" ON) 
 
-option (DFITC_SOP_MDPlugin "Support DFITC quotation" ON) 
-option (DFITC_SOP_TDPlugin "Support DFITC trade" ON) 
+option (DFITC_SOP_MDPlugin "Support DFITC quotation" OFF) 
+option (DFITC_SOP_TDPlugin "Support DFITC trade" OFF) 
 
 option (FEMAS_FUTURE_MDPlugin "Support FEMAS quotation" OFF) 
 option (FEMAS_FUTURE_TDPlugin "Support FEMAS trade" OFF) 
+
+option (KR_QUANT_MDPlugin "Support KR_QUANT quotation" ON) 
+option (KR_QUANT_MDPlugin "Support KR_QUANT trade" ON) 
 
 add_library(autopend STATIC  common/AutoPend.cpp)
 
@@ -129,11 +132,23 @@ if (FEMAS_FUTURE_TDPlugin)
     install(FILES "${PROJECT_SOURCE_DIR}/third/Femas/libUSTPtraderapi.so" DESTINATION lib)
 endif (FEMAS_FUTURE_TDPlugin)
 
+    ####################### KR_QUANT ##########################################
+include_directories("${PROJECT_SOURCE_DIR}third/Kr360Quant/include/")
+link_directories("${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/")
+    
+if (KR_QUANT_MDPlugin)
+    add_definitions(-KR_QUANT_MDPlugin) 
+    set(kr_quant_mdplugpath "${PROJECT_SOURCE_DIR}/trade/md_plugins/KR_QUANT_MDPlugin")
+    include_directories("${kr_quant_mdplugpath}")
+    add_library(kr_quant_mdplugin STATIC ${kr_quant_mdplugpath}/KR_QUANT_MDPlugin.cpp)
+    target_link_libraries(kr_quant_mdplugin ${libs} "${PROJECT_SOURCE_DIR}third/Kr360Quant/linux64/liboes_api.so")
+    install(FILES "${PROJECT_SOURCE_DIR}/third/Kr360Quant/linux64/liboes_api.so" DESTINATION lib)
+endif (KR_QUANT_MDPlugin)
 
 #################### trade_service 
 include_directories(${PROJECT_SOURCE_DIR}/trade)
 add_executable(thunder-trader trade/main.cpp trade/connection.cpp trade/io_service_pool.cpp trade/server.cpp trade/trade_service.cpp)
-target_link_libraries(thunder-trader ${libs} ctp_future_mdplugin ctp_future_tdplugin dfitc_sop_mdplugin dfitc_sop_tdplugin autopend)
+target_link_libraries(thunder-trader ${libs} ctp_future_mdplugin ctp_future_tdplugin kr_quant_mdplugin autopend)
 
 install (TARGETS thunder-trader DESTINATION bin)
 install (FILES thunder-trader.conf.default DESTINATION bin RENAME thunder-trader.conf)

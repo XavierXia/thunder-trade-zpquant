@@ -1,45 +1,36 @@
-#include "MDPluginImp.h"
+#include "KR_QUANT_MDPlugin.h"
 #include <stdarg.h>
 #include <thread>
-const string CMDPluginImp::s_strAccountKeyword="serveraddress;brokerid;username;password;";
+const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 
-CMDPluginImp::CMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
+CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
 {
 }
 
-CMDPluginImp::~CMDPluginImp()
+CKrQuantMDPluginImp::~CKrQuantMDPluginImp()
 {
 }
 
-bool CMDPluginImp::IsOnline()
+bool CKrQuantMDPluginImp::IsOnline()
 {
 	return m_boolIsOnline;
 }
 
-void CMDPluginImp::IncreaseRefCount()
+void CKrQuantMDPluginImp::IncreaseRefCount()
 {
 	m_intRefCount++;
 }
 
-void CMDPluginImp::DescreaseRefCount()
+void CKrQuantMDPluginImp::DescreaseRefCount()
 {
 	m_intRefCount--;
 }
 
-int CMDPluginImp::GetRefCount()
+int CKrQuantMDPluginImp::GetRefCount()
 {
 	return m_intRefCount;
 }
 
-void CMDPluginImp::CheckSymbolValidity(const unordered_map<string, string> & insConfig)
-{
-
-}
-
-string CMDPluginImp::GetCurrentKeyword()
-{
-	return "kr_mds&"+m_strUsername;
-}
 
 /*
 {"type":"reqdeploynewstrategy","bin":"strategy_simple_strategy","archive":"",
@@ -47,8 +38,24 @@ string CMDPluginImp::GetCurrentKeyword()
 "dataid":{"0":{"symboldefine":{"type":"future","instrumentid":"CF903","exchangeid":"CZCE"},
 "marketdatasource":"ctp_md&120842&9999","tradesource":"ctp_td&120842&9999"}}}
 */
+void CKrQuantMDPluginImp::CheckSymbolValidity(const unordered_map<string, string> & insConfig)
+{
+	auto Type = insConfig.find("type");
+	if (Type == insConfig.end())
+		throw std::runtime_error("Can not find the <type> of the the symbol.");
+	if (Type->second != "kr360")
+		throw std::runtime_error("kr360 MarketDataSource does not support this symbol.");
+	auto InstrumentNode = insConfig.find("instrumentid");
+	if (InstrumentNode == insConfig.end())
+		throw std::runtime_error("<instrumentid> not found.");
+}
 
-string CMDPluginImp::GetProspectiveKeyword(const ptree & in)
+string CKrQuantMDPluginImp::GetCurrentKeyword()
+{
+	return "kr_mds&"+m_strUsername;
+}
+
+string CKrQuantMDPluginImp::GetProspectiveKeyword(const ptree & in)
 {
 	string retKey = "kr_mds&";
 	auto temp = in.find("username");
@@ -61,23 +68,11 @@ string CMDPluginImp::GetProspectiveKeyword(const ptree & in)
 	}
 	else
 		throw std::exception("kr_mds:can not find <username>");
-	retKey += "&";
-
-	temp = in.find("brokerid");
-	if (temp != in.not_found())
-	{
-
-		if (temp->second.data().size()>(sizeof(CThostFtdcReqUserLoginField::BrokerID) - 1))
-			throw std::exception("ctp:brokerid is too long");
-		retKey += temp->second.data();
-	}
-	else
-		throw std::exception("ctp:can not find <brokerid>");
 
 	return retKey;
 }
 
-void CMDPluginImp::GetState(ptree & out)
+void CKrQuantMDPluginImp::GetState(ptree & out)
 {
 	if(m_boolIsOnline)
 		out.put("online","true");
@@ -88,17 +83,11 @@ void CMDPluginImp::GetState(ptree & out)
 	out.put("username", m_strUsername);
 }
 
-void CMDPluginImp::MDInit(const ptree & in)
+void CKrQuantMDPluginImp::MDInit(const ptree & in)
 {
-	static const char   THE_CONFIG_FILE_NAME[] = "mds_client.conf";
-    MdsApiClientEnvT    cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
-
-    if (! MdsApi_InitAll(&cliEnv, THE_CONFIG_FILE_NAME,
-            MDSAPI_CFG_DEFAULT_SECTION_LOGGER, MDSAPI_CFG_DEFAULT_SECTION,
-            MDSAPI_CFG_DEFAULT_KEY_TCP_ADDR, MDSAPI_CFG_DEFAULT_KEY_QRY_ADDR,
-            (char *) NULL, (char *) NULL, (char *) NULL, (char *) NULL)) {
-        throw std::runtime_error("MdsApi_InitAll error!!!");
-    }
+	//读取配置
+	THE_CONFIG_FILE_NAME = "mds_client.conf";
+    cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
 
 	m_StartAndStopCtrlTimer.expires_from_now(time_duration(0,0,3,0));
 	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CMDPluginImp::TimerHandler,this));
@@ -109,7 +98,7 @@ void CMDPluginImp::MDInit(const ptree & in)
 
 }
 
-void CMDPluginImp::TimerHandler()
+void CKrQuantMDPluginImp::TimerHandler()
 {
 	time_duration tid = second_clock::universal_time().time_of_day();
 	ptime nextActiveTime=not_a_date_time;
@@ -146,16 +135,18 @@ void CMDPluginImp::TimerHandler()
 	ShowMessage(normal, "%s: Next:%s", GetCurrentKeyword().c_str(), to_simple_string(nextActiveTime).c_str());
 }
 
-bool CMDPluginImp::Start()
+bool CKrQuantMDPluginImp::Start()
 {
 	m_uRequestID = 0;
 	m_boolIsOnline = false;
-	m_pUserApi = std::shared_ptr<CThostFtdcMdApi>(CThostFtdcMdApi::CreateFtdcMdApi(), [](CThostFtdcMdApi* p) {if (p) p->Release();});
-	m_pUserApi->RegisterSpi(this);
-	char ServerAddress[65];
-	strcpy(ServerAddress, m_strServerAddress.c_str());
-	m_pUserApi->RegisterFront(ServerAddress);
-	m_pUserApi->Init();
+
+    /* 初始化客户端环境 (配置文件参见: mds_client_sample.conf) */
+    if (! MdsApi_InitAllByConvention(&cliEnv, THE_CONFIG_FILE_NAME)) 
+    {
+    	ShowMessage(severity_levels::error, "kr_mds:MdsApi_InitAllByConvention failed.");
+        return false;
+    }
+
 	std::unique_lock<std::mutex> lk(m_mtxLoginSignal);
 	m_cvLoginSignalCV.wait_for(lk,std::chrono::seconds(10));
 	if (m_boolIsOnline)
@@ -164,11 +155,11 @@ bool CMDPluginImp::Start()
 		return false;
 }
 
-void CMDPluginImp::Stop()
+void CKrQuantMDPluginImp::Stop()
 {
 	if (m_boolIsOnline)
 	{
-		boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//д��
+		boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
 		unsigned int InstrumentCount = m_mapInsid2Strategys.size();
 		typedef char * NAME;
 		char * * ppInstrumentID = new NAME[InstrumentCount];
@@ -178,18 +169,14 @@ void CMDPluginImp::Stop()
 			ppInstrumentID[i] = new char[31];//TThostFtdcInstrumentIDType
 			strncpy(ppInstrumentID[i], pos->first.c_str(), 31);
 		}
-		if (0 != m_pUserApi->UnSubscribeMarketData(ppInstrumentID, InstrumentCount))
-			ShowMessage(severity_levels::error, "send unsubscribemarketdata failed.");
+
+		MdsApi_LogoutAll(&cliEnv, TRUE);
+
 		for (auto i = 0;i < InstrumentCount;i++)
 			delete[] ppInstrumentID[i];
 		delete[] ppInstrumentID;
 	}
-	if (m_pUserApi)
-	{
-		
-		m_pUserApi->RegisterSpi(nullptr);
-		m_pUserApi=nullptr;
-	}
+
 	ShowMessage(
 		severity_levels::normal,
 		"%s loginout succeed!",
@@ -197,7 +184,7 @@ void CMDPluginImp::Stop()
 	m_boolIsOnline = false;
 }
 
-void CMDPluginImp::MDUnload()
+void CKrQuantMDPluginImp::MDUnload()
 {
 	
 	Stop();
@@ -206,7 +193,45 @@ void CMDPluginImp::MDUnload()
 	m_futTimerThreadFuture.get();
 }
 
-void CMDPluginImp::ShowMessage(severity_levels lv, const char * fmt, ...)
+void CKrQuantMDPluginImp::OnError()
+{
+	if (m_boolIsOnline)
+	{
+		boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
+		unsigned int InstrumentCount = m_mapInsid2Strategys.size();
+		typedef char * NAME;
+		char * * ppInstrumentID = new NAME[InstrumentCount];
+		auto pos = m_mapInsid2Strategys.begin();
+		for (unsigned int i = 0;i < InstrumentCount;++i, ++pos)
+		{
+			ppInstrumentID[i] = new char[31];//TThostFtdcInstrumentIDType
+			strncpy(ppInstrumentID[i], pos->first.c_str(), 31);
+		}
+
+		MdsApi_DestoryAll(&cliEnv);
+
+		for (auto i = 0;i < InstrumentCount;i++)
+			delete[] ppInstrumentID[i];
+		delete[] ppInstrumentID;
+	}
+
+	ShowMessage(
+		severity_levels::normal,
+		"%s DestoryAll succeed!",
+		GetCurrentKeyword().c_str());
+	m_boolIsOnline = false;
+}
+
+void CKrQuantMDPluginImp::MDDestoryAll()
+{
+	
+	OnError();
+	//m_StartAndStopCtrlTimer.cancel();
+	m_IOservice.stop();
+	m_futTimerThreadFuture.get();
+}
+
+void CKrQuantMDPluginImp::ShowMessage(severity_levels lv, const char * fmt, ...)
 {
 	char buf[512];
 	va_list arg;
@@ -217,9 +242,9 @@ void CMDPluginImp::ShowMessage(severity_levels lv, const char * fmt, ...)
 	BOOST_LOG_SEV(m_Logger, lv) << buf;
 }
 
-void CMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType dataid,const unordered_map<string, string> & insConfig,boost::shared_mutex & mtx)
+void CKrQuantMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType dataid,const unordered_map<string, string> & insConfig,boost::shared_mutex & mtx)
 {
-	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//д��
+	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
 
 	auto InstrumentID = insConfig.find("instrumentid")->second;
 	auto findres = m_mapInsid2Strategys.find(InstrumentID);
@@ -235,22 +260,33 @@ void CMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType datai
 			char * * ppInstrumentID = new NAME[1];
 			ppInstrumentID[0] = new char[31];//TThostFtdcInstrumentIDType
 			strncpy(ppInstrumentID[0], InstrumentID.c_str(), 31);
-			if (0 != m_pUserApi->SubscribeMarketData(ppInstrumentID, 1))
-				ShowMessage(
+			// if (0 != m_pUserApi->SubscribeMarketData(ppInstrumentID, 1))
+			// 	ShowMessage(
+			// 		severity_levels::error,
+			// 		"send subscribemarketdata(%s) failed.", 
+			// 		InstrumentID.c_str());
+
+			/* 根据证券代码列表重新订阅行情 (根据代码后缀区分所属市场) */
+        	if (!MDResubscribeByCodePrefix(&cliEnv.tcpChannel,InstrumentID.c_str())) 
+        	{
+        		ShowMessage(
 					severity_levels::error,
-					"send subscribemarketdata(%s) failed.", 
+					"send MdsApiSample_ResubscribeByCodePrefix(%s) failed.", 
 					InstrumentID.c_str());
+            	MDDestoryAll();
+       		}
+
 			delete[] ppInstrumentID[0];
 			delete[] ppInstrumentID;
+
+			OnWaitOnMsg();
 		}
 	}
-	
-
 }
 
-void CMDPluginImp::MDDetachStrategy(MStrategy * strategy)
+void CKrQuantMDPluginImp::MDDetachStrategy(MStrategy * strategy)
 {
-	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//д��
+	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
 
 	for (auto & ins : m_mapStrategy2Insids[strategy])
 	{
@@ -267,12 +303,23 @@ void CMDPluginImp::MDDetachStrategy(MStrategy * strategy)
 			char * * ppInstrumentID = new NAME[1];
 			ppInstrumentID[0] = new char[31];//TThostFtdcInstrumentIDType
 			strncpy(ppInstrumentID[0], ins.c_str(), 31);
-			if (0 != m_pUserApi->UnSubscribeMarketData(ppInstrumentID, 1))
-				ShowMessage(
-					severity_levels::error, 
-					"%s: send unsubscribemarketdata(%s) failed.", 
-					GetCurrentKeyword().c_str(),
-					ins.c_str());
+			// if (0 != m_pUserApi->UnSubscribeMarketData(ppInstrumentID, 1))
+			// 	ShowMessage(
+			// 		severity_levels::error, 
+			// 		"%s: send unsubscribemarketdata(%s) failed.", 
+			// 		GetCurrentKeyword().c_str(),
+			// 		ins.c_str());
+
+			/* 根据证券代码列表重新订阅行情 (根据代码后缀区分所属市场) */
+        	if (!MDResubscribeByCodePrefix(&cliEnv.tcpChannel,"")) 
+        	{
+        		ShowMessage(
+					severity_levels::error,
+					"send unsubscribemarketdata(%s) failed.", 
+					GetCurrentKeyword().c_str());
+            	MDDestoryAll();
+       		}
+
 			delete[] ppInstrumentID[0];
 			delete[] ppInstrumentID;
 			m_mapInsid2Strategys.erase(ins);
@@ -282,193 +329,157 @@ void CMDPluginImp::MDDetachStrategy(MStrategy * strategy)
 
 }
 
+/**
+ * 通过证券代码列表, 重新订阅行情数据 (根据代码前缀区分所属市场)
+ *
+ * @param   pTcpChannel         会话信息
+ * @param   pCodeListString     证券代码列表字符串 (以空格或逗号/分号/竖线分割的字符串)
+ * @return  TRUE 成功; FALSE 失败
+ */
+BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
+        const char *pCodeListString) {
+    /* 上海证券代码前缀 */
+    static const char       SSE_CODE_PREFIXES[] = \
+            "009, 01, 02, "                 /* 国债 */ \
+            "10, 11, 12, 13, 18, 19, "      /* 债券 (企业债、可转债等) */ \
+            "20, "                          /* 债券 (回购) */ \
+            "5, "                           /* 基金 */ \
+            "6, "                           /* A股 */ \
+            "#000";                         /* 指数 (@note 与深圳股票代码重合) */
 
+    /* 深圳证券代码前缀 */
+    static const char       SZSE_CODE_PREFIXES[] = \
+            "00, "                          /* 股票 */ \
+            "10, 11, 12, 13, "              /* 债券 */ \
+            "15, 16, 17, 18, "              /* 基金 */ \
+            "30"                            /* 创业板 */ \
+            "39";                           /* 指数 */
 
-void CMDPluginImp::OnFrontConnected()
-{
-	CThostFtdcReqUserLoginField req;
-	memset(&req, 0, sizeof(req));
-	strncpy(req.BrokerID, m_strBrokerID.c_str(), sizeof(req.BrokerID));
-	strncpy(req.UserID, m_strUsername.c_str(), sizeof(req.UserID));
-	strncpy(req.Password, m_strPassword.c_str(), sizeof(req.Password));
-	int res = m_pUserApi->ReqUserLogin(&req, ++m_uRequestID);
-	if (0 != res)
-	{
-		ShowMessage(
-			severity_levels::error,
-			"%s: send requserlogin failed.",
-			GetCurrentKeyword().c_str());
-		std::unique_lock<std::mutex> lk(m_mtxLoginSignal);
-		m_cvLoginSignalCV.notify_all();
-	}
+    return MdsApi_SubscribeByStringAndPrefixes(pTcpChannel,
+            pCodeListString, (char *) NULL,
+            SSE_CODE_PREFIXES, SZSE_CODE_PREFIXES,
+            MDS_SECURITY_TYPE_STOCK, MDS_SUB_MODE_SET,
+            MDS_SUB_DATA_TYPE_L1_SNAPSHOT
+                    | MDS_SUB_DATA_TYPE_L2_SNAPSHOT
+                    | MDS_SUB_DATA_TYPE_L2_BEST_ORDERS
+                    | MDS_SUB_DATA_TYPE_L2_ORDER
+                    | MDS_SUB_DATA_TYPE_L2_TRADE);
 }
 
-void CMDPluginImp::OnFrontDisconnected(int nReason)
-{
-	ShowMessage(
-		severity_levels::error, 
-		"%s: OnFrontDisconnected(%d)",
-		GetCurrentKeyword().c_str(),
-		nReason);
+/**
+ * 进行消息处理的回调函数
+ *
+ * @param   pSessionInfo    会话信息
+ * @param   pMsgHead        消息头
+ * @param   pMsgBody        消息体数据
+ * @param   pCallbackParams 外部传入的参数
+ * @return  大于等于0，成功；小于0，失败（错误号）
+ */
+static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+        SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
+    MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
+
+    /*
+     * 根据消息类型对行情消息进行处理
+     */
+    switch (pMsgHead->msgId) {
+    case MDS_MSGTYPE_L2_TRADE:
+        /* 处理Level2逐笔成交消息 */
+        printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+                pRspMsg->trade.exchId,
+                pRspMsg->trade.instrId);
+        break;
+
+    case MDS_MSGTYPE_L2_ORDER:
+        /* 处理Level2逐笔委托消息 */
+        printf("... 接收到Level2逐笔委托消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+                pRspMsg->order.exchId,
+                pRspMsg->order.instrId);
+        break;
+
+    case MDS_MSGTYPE_L2_MARKET_DATA_SNAPSHOT:
+    case MDS_MSGTYPE_L2_BEST_ORDERS_SNAPSHOT:
+    case MDS_MSGTYPE_L2_MARKET_DATA_INCREMENTAL:
+    case MDS_MSGTYPE_L2_BEST_ORDERS_INCREMENTAL:
+    case MDS_MSGTYPE_L2_MARKET_OVERVIEW:
+    case MDS_MSGTYPE_L2_VIRTUAL_AUCTION_PRICE:
+        /* 处理Level2快照行情消息 */
+        printf("... 接收到Level2快照行情消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+                pRspMsg->mktDataSnapshot.head.exchId,
+                pRspMsg->mktDataSnapshot.head.instrId);
+        break;
+
+    case MDS_MSGTYPE_MARKET_DATA_SNAPSHOT_FULL_REFRESH:
+    case MDS_MSGTYPE_OPTION_SNAPSHOT_FULL_REFRESH:
+    case MDS_MSGTYPE_INDEX_SNAPSHOT_FULL_REFRESH:
+        /* 处理Level1快照行情消息 */
+        printf("... 接收到Level1快照行情消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+                pRspMsg->mktDataSnapshot.head.exchId,
+                pRspMsg->mktDataSnapshot.head.instrId);
+        break;
+
+    case MDS_MSGTYPE_SECURITY_STATUS:
+        /* 处理(深圳)证券状态消息 */
+        printf("... 接收到(深圳)证券状态消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+                pRspMsg->securityStatus.exchId,
+                pRspMsg->securityStatus.instrId);
+        break;
+
+    case MDS_MSGTYPE_TRADING_SESSION_STATUS:
+        /* 处理(上证)市场状态消息 */
+        printf("... 接收到(上证)市场状态消息 (exchId[%" __SPK_FMT_HH__ "u], TradingSessionID[%s])\n",
+                pRspMsg->trdSessionStatus.exchId,
+                pRspMsg->trdSessionStatus.TradingSessionID);
+        break;
+
+    case MDS_MSGTYPE_MARKET_DATA_REQUEST:
+        /* 处理行情订阅请求的应答消息 */
+        if (pMsgHead->status == 0) {
+            printf("... 行情订阅请求应答, 行情订阅成功!\n");
+        } else {
+            printf("... 行情订阅请求应答, 行情订阅失败! " \
+                    "errCode[%02" __SPK_FMT_HH__ "u%02" __SPK_FMT_HH__ "u]\n",
+                    pMsgHead->status, pMsgHead->detailStatus);
+        }
+        break;
+
+    case MDS_MSGTYPE_TEST_REQUEST:
+        /* 处理测试请求的应答消息 */
+        printf("... 接收到测试请求的应答消息 (origSendTime[%s], respTime[%s])\n",
+                pRspMsg->testRequestRsp.origSendTime,
+                pRspMsg->testRequestRsp.respTime);
+        break;
+
+    case MDS_MSGTYPE_HEARTBEAT:
+        /* 忽略心跳消息 */
+        break;
+
+    default:
+        printf("无效的消息类型, 忽略之! msgId[0x%02X], server[%s:%d]",
+                pMsgHead->msgId, pSessionInfo->channel.remoteAddr,
+                pSessionInfo->channel.remotePort);
+        return EFTYPE;
+    }
+
+    return 0;
 }
 
-void CMDPluginImp::OnHeartBeatWarning(int nTimeLapse)
+void CKrQuantMDPluginImp::OnWaitOnMsg()
 {
-	ShowMessage(
-		severity_levels::error,
-		"%s: onheartbeatwarning(%d)",
-		GetCurrentKeyword().c_str(),
-		nTimeLapse);
+    /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
+    int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
+            MdsApi_OnRtnDepthMarketData, NULL);
+    if (unlikely(ret < 0)) {
+        if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
+            /* 执行超时检查 (检查会话是否已超时) */
+            ;
+        }
+
+        if (SPK_IS_NEG_EPIPE(ret)) {
+            /* 连接已断开 */
+        }
+        MDDestoryAll();
+    }
 }
-
-void CMDPluginImp::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if ((pRspInfo) && (pRspInfo->ErrorID != 0))
-	{
-		m_boolIsOnline = false;
-		ShowMessage(
-			severity_levels::error,
-			"%s login failed.errorid=%d,errormsg=%s",
-			GetCurrentKeyword().c_str(), 
-			pRspInfo->ErrorID,
-			pRspInfo->ErrorMsg);
-	}
-	else
-	{
-		m_boolIsOnline = true;
-		ShowMessage(
-			severity_levels::normal,
-			"%s login succeed!",
-			GetCurrentKeyword().c_str());
-
-		boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//д��
-		unsigned int InstrumentCount = m_mapInsid2Strategys.size();
-		if (0 != InstrumentCount)
-		{
-			typedef char * NAME;
-			char * * ppInstrumentID = new NAME[InstrumentCount];
-			auto pos = m_mapInsid2Strategys.begin();
-			for (unsigned int i = 0;i < InstrumentCount;++i, ++pos)
-			{
-				ppInstrumentID[i] = new char[31];//TThostFtdcInstrumentIDType
-				strncpy(ppInstrumentID[i], pos->first.c_str(), 31);
-			}
-			if (0 != m_pUserApi->SubscribeMarketData(ppInstrumentID, InstrumentCount))
-				ShowMessage(severity_levels::error, "send subscribemarketdata failed.");
-			for (auto i = 0;i < InstrumentCount;i++)
-				delete[] ppInstrumentID[i];
-			delete[] ppInstrumentID;
-		}
-	}
-	std::unique_lock<std::mutex> lk(m_mtxLoginSignal);
-	m_cvLoginSignalCV.notify_all();
-}
-
-void CMDPluginImp::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{}
-
-void CMDPluginImp::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if ((pRspInfo) && (pRspInfo->ErrorID != 0))
-	{
-		m_boolIsOnline=false;
-		ShowMessage(severity_levels::error,
-			"%s onrsperror.errorid=%d,errormsg=%s", 
-			GetCurrentKeyword().c_str(), 
-			pRspInfo->ErrorID,
-			pRspInfo->ErrorMsg);
-	}
-}
-
-void CMDPluginImp::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (pRspInfo&&pRspInfo->ErrorID != 0)
-	{
-		ShowMessage(severity_levels::error,
-			"%s errorid=%d,errormsg=%s",
-			GetCurrentKeyword().c_str(),
-			pRspInfo->ErrorID,
-			pRspInfo->ErrorMsg);
-	}
-	else if(pSpecificInstrument&&pSpecificInstrument->InstrumentID[0]!=0)
-	{
-		ShowMessage(severity_levels::normal,
-			"submarketdata %s succeed",
-			pSpecificInstrument->InstrumentID);
-	}
-}
-
-void CMDPluginImp::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (pRspInfo&&pRspInfo->ErrorID != 0)
-	{
-		ShowMessage(severity_levels::error,
-			"%s errorid=%d,errormsg=%s",
-			GetCurrentKeyword().c_str(),
-			pRspInfo->ErrorID,
-			pRspInfo->ErrorMsg);
-	}
-	else if (pSpecificInstrument&&pSpecificInstrument->InstrumentID[0] != 0)
-	{
-		ShowMessage(severity_levels::normal,
-			"unsubmarketdata %s succeed.",
-			pSpecificInstrument->InstrumentID);
-	}
-}
-
-void CMDPluginImp::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{}
-
-void CMDPluginImp::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{}
-
-void CMDPluginImp::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
-{
-	if (0 == pDepthMarketData->InstrumentID[0])
-		return;
-	boost::shared_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//����
-	auto & InstrumentNode = m_mapInsid2Strategys[pDepthMarketData->InstrumentID];
-	auto & tick = InstrumentNode.first;
-	try {
-		strncpy(tick.m_strInstrumentID, pDepthMarketData->InstrumentID, sizeof(tick.m_strInstrumentID));
-		tick.m_intVolume = pDepthMarketData->Volume;
-		tick.m_dbLastPrice = pDepthMarketData->LastPrice;
-		tick.m_datetimeUTCDateTime = ptime(from_undelimited_string(pDepthMarketData->TradingDay), duration_from_string(pDepthMarketData->UpdateTime) + milliseconds(pDepthMarketData->UpdateMillisec));//pDepthMarketData-;
-		tick.m_datetimeUTCDateTime -= hours(8);
-		tick.m_dbLowerLimitPrice = pDepthMarketData->LowerLimitPrice;
-		tick.m_dbUpperLimitPrice = pDepthMarketData->UpperLimitPrice;
-		tick.m_dbLowestPrice = pDepthMarketData->LastPrice;
-		tick.m_dbBidPrice1 = pDepthMarketData->BidPrice1;
-		tick.m_intBidVolume1 = pDepthMarketData->BidVolume1;
-		tick.m_dbAskPrice1 = pDepthMarketData->AskPrice1;
-		tick.m_intAskVolume1 = pDepthMarketData->AskVolume1;
-	}
-	catch (std::exception & err)
-	{
-		ShowMessage(severity_levels::error,"%s: error :%s", GetCurrentKeyword().c_str(), err.what());
-		return;
-	}
-	catch (...)
-	{
-		ShowMessage(severity_levels::error, "%s: error :unknow", GetCurrentKeyword().c_str());
-		return;
-	}
-
-	for(auto & node: InstrumentNode.second)
-	{
-		boost::unique_lock<boost::shared_mutex> lk(*get<2>(node), boost::try_to_lock);
-		if (lk.owns_lock())
-			get<0>(node)->OnTick(get<1>(node), &tick);
-		else
-			ShowMessage(severity_levels::warning,
-				"%s: onrtndepthmarketdata try lock failed:%s",
-				GetCurrentKeyword().c_str(),
-				pDepthMarketData->InstrumentID);
-	}
-
-}
-
-void CMDPluginImp::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
-{}
 
 

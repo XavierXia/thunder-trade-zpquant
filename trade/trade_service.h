@@ -69,6 +69,10 @@
 #include "TWS_TDPlugin/TWS_TDPlugin.h"
 #endif
 
+#ifdef KR_QUANT_MDPlugin
+#include "KR_QUANT_MDPlugin/KR_QUANT_MDPlugin.h"
+#endif
+
 #include <functional>
 #include <list>
 #include <memory>
@@ -187,6 +191,10 @@ class CTradeService :
 
 #ifdef FIX_CYCLE_PRICE_MDPlugin
         PLUGIN("fix_cycle_price",CFixCyclePricePluginImp)
+#endif
+
+#ifdef KR_QUANT_MDPlugin
+        PLUGIN("kr_quant",CKrQuantMDPluginImp)
 #endif
 
     };
