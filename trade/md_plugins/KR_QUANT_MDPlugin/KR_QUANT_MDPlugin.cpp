@@ -7,12 +7,17 @@ const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 extern char ProcessName[256];
 const char THE_CONFIG_FILE_NAME[100]="/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
 
-CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice)
+CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice),m_abIsPending(false), m_adbIsPauseed(false)
 {
 }
 
 CKrQuantMDPluginImp::~CKrQuantMDPluginImp()
 {
+}
+
+bool CCTP_FUTURE_MDPlugin::IsPedding()
+{
+	return m_abIsPending.load();
 }
 
 bool CKrQuantMDPluginImp::IsOnline()
@@ -34,7 +39,6 @@ int CKrQuantMDPluginImp::GetRefCount()
 {
 	return m_intRefCount;
 }
-
 
 /*
 {"type":"reqdeploynewstrategy","bin":"strategy_simple_strategy","archive":"",
@@ -93,7 +97,13 @@ void CKrQuantMDPluginImp::MDInit(const ptree & in)
 		this->m_IOservice.run();
 		return true;
 	});
+}
 
+void CCTP_FUTURE_MDPlugin::MDHotUpdate(const ptree & NewConfig)
+{
+	MDUnload();
+	m_IOservice.reset();
+	MDInit(NewConfig);
 }
 
 void CKrQuantMDPluginImp::TimerHandler()
@@ -186,9 +196,19 @@ void CKrQuantMDPluginImp::MDUnload()
 {
 	
 	Stop();
-	//m_StartAndStopCtrlTimer.cancel();
+	m_StartAndStopCtrlTimer.cancel();
 	m_IOservice.stop();
 	m_futTimerThreadFuture.get();
+}
+
+void CCTP_FUTURE_MDPlugin::Pause()
+{
+	m_adbIsPauseed.store(true);
+}
+
+void CCTP_FUTURE_MDPlugin::Continue()
+{
+	m_adbIsPauseed.store(false);
 }
 
 void CKrQuantMDPluginImp::OnError()
@@ -224,7 +244,7 @@ void CKrQuantMDPluginImp::MDDestoryAll()
 {
 	
 	OnError();
-	//m_StartAndStopCtrlTimer.cancel();
+	m_StartAndStopCtrlTimer.cancel();
 	m_IOservice.stop();
 	m_futTimerThreadFuture.get();
 }

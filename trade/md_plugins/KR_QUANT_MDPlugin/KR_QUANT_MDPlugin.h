@@ -62,6 +62,8 @@ public:
 	CKrQuantMDPluginImp();
 	~CKrQuantMDPluginImp();
 	int m_intRefCount = 0;
+	atomic_bool m_abIsPending;
+	bool IsPedding();
 	virtual bool IsOnline();
 	virtual void IncreaseRefCount();
 	virtual void DescreaseRefCount();
@@ -72,7 +74,7 @@ public:
 	virtual void GetState(ptree & out);
 	virtual void MDInit(const ptree &);
 	virtual void MDUnload();
-
+	atomic<bool> m_adbIsPauseed;
 	virtual void MDAttachStrategy(
 		MStrategy *, 
 		TMarketDataIdType,
@@ -80,7 +82,6 @@ public:
 		boost::shared_mutex &);
 	virtual void MDDetachStrategy(MStrategy*/*IN*/);
 
-	bool IsPedding();
 	virtual void MDHotUpdate(const ptree &);
 	virtual void Pause();
 	virtual void Continue();
