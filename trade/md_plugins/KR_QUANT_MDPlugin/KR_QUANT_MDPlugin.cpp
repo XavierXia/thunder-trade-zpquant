@@ -260,7 +260,7 @@ void CKrQuantMDPluginImp::ShowMessage(severity_levels lv, const char * fmt, ...)
 	BOOST_LOG_SEV(m_Logger, lv) << buf;
 }
 
-void CKrQuantMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType dataid,const unordered_map<string, string> & insConfig,boost::shared_mutex & mtx)
+void CKrQuantMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType dataid,const unordered_map<string, string> & insConfig,boost::shared_mutex & mtx,atomic_uint_least64_t * updatetime)
 {
 	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
 
