@@ -411,7 +411,7 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
         // printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
         //         pRspMsg->trade.exchId,
         //         pRspMsg->trade.instrId);
-        ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
+        this.ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
 		                pRspMsg->trade.exchId,
 		                pRspMsg->trade.instrId);
         break;
@@ -498,12 +498,13 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg, 行情订阅成功!\n");
 	
 
-    std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack = CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData;
+    //std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack = CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData;
 
+	MarketDataCallBack mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
 	static const int32  THE_TIMEOUT_MS = 1000;
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-            MarketDataCallBack, NULL);
+            mdcallback, NULL);
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
             /* 执行超时检查 (检查会话是否已超时) */

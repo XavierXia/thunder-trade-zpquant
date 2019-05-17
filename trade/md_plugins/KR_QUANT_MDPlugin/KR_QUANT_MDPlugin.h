@@ -28,6 +28,9 @@ using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace boost::asio;
 using namespace std;
+
+typedef std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack; 
+
 class CKrQuantMDPluginImp:
 	public MAtmMarketDataPluginInterface
 {
@@ -91,7 +94,7 @@ public:
 	BOOL MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
         const char *pCodeListString);
 	void OnWaitOnMsg();
-	static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+	int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 private:
