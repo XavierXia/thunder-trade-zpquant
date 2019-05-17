@@ -398,7 +398,7 @@ BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChan
  * @param   pCallbackParams 外部传入的参数
  * @return  大于等于0，成功；小于0，失败（错误号）
  */
-int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
 
@@ -411,7 +411,7 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
         // printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
         //         pRspMsg->trade.exchId,
         //         pRspMsg->trade.instrId);
-        ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
 		                pRspMsg->trade.exchId,
 		                pRspMsg->trade.instrId);
         break;
@@ -421,7 +421,7 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
         // printf("... 接收到Level2逐笔委托消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
         //         pRspMsg->order.exchId,
         //         pRspMsg->order.instrId);
-        ShowMessage(severity_levels::normal,"... 接收到Level2逐笔委托消息 (exchId[%u], instrId[%d])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到Level2逐笔委托消息 (exchId[%u], instrId[%d])\n",
 		                pRspMsg->trade.exchId,
 		                pRspMsg->trade.instrId);
         break;
@@ -433,7 +433,7 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
     case MDS_MSGTYPE_L2_MARKET_OVERVIEW:
     case MDS_MSGTYPE_L2_VIRTUAL_AUCTION_PRICE:
         /* 处理Level2快照行情消息 */
-        ShowMessage(severity_levels::normal,"... 接收到Level2快照行情消息 (exchId[%u], instrId[%d])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到Level2快照行情消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->mktDataSnapshot.head.exchId,
                 pRspMsg->mktDataSnapshot.head.instrId);
         break;
@@ -442,21 +442,21 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
     case MDS_MSGTYPE_OPTION_SNAPSHOT_FULL_REFRESH:
     case MDS_MSGTYPE_INDEX_SNAPSHOT_FULL_REFRESH:
         /* 处理Level1快照行情消息 */
-        ShowMessage(severity_levels::normal,"... 接收到Level1快照行情消息 (exchId[%u], instrId[%d])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到Level1快照行情消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->mktDataSnapshot.head.exchId,
                 pRspMsg->mktDataSnapshot.head.instrId);
         break;
 
     case MDS_MSGTYPE_SECURITY_STATUS:
         /* 处理(深圳)证券状态消息 */
-        ShowMessage(severity_levels::normal,"... 接收到(深圳)证券状态消息 (exchId[%u], instrId[%d])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到(深圳)证券状态消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->securityStatus.exchId,
                 pRspMsg->securityStatus.instrId);
         break;
 
     case MDS_MSGTYPE_TRADING_SESSION_STATUS:
         /* 处理(上证)市场状态消息 */
-        ShowMessage(severity_levels::normal,"... 接收到(上证)市场状态消息 (exchId[%u], TradingSessionID[%s])\n",
+        //ShowMessage(severity_levels::normal,"... 接收到(上证)市场状态消息 (exchId[%u], TradingSessionID[%s])\n",
                 pRspMsg->trdSessionStatus.exchId,
                 pRspMsg->trdSessionStatus.TradingSessionID);
         break;
@@ -464,19 +464,19 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
     case MDS_MSGTYPE_MARKET_DATA_REQUEST:
         /* 处理行情订阅请求的应答消息 */
         if (pMsgHead->status == 0) {
-            ShowMessage(severity_levels::normal,"... 行情订阅请求应答, 行情订阅成功!\n");
+            //ShowMessage(severity_levels::normal,"... 行情订阅请求应答, 行情订阅成功!\n");
         } else {
-            ShowMessage(severity_levels::error,"... 行情订阅请求应答, 行情订阅失败! " \
-                    "errCode[%02u %02u]\n",
-                    pMsgHead->status, pMsgHead->detailStatus);
+            //ShowMessage(severity_levels::error,"... 行情订阅请求应答, 行情订阅失败! " \
+             //       "errCode[%02u %02u]\n",
+              //      pMsgHead->status, pMsgHead->detailStatus);
         }
         break;
 
     case MDS_MSGTYPE_TEST_REQUEST:
         /* 处理测试请求的应答消息 */
-        ShowMessage(severity_levels::normal,"... 接收到测试请求的应答消息 (origSendTime[%s], respTime[%s])\n",
-                pRspMsg->testRequestRsp.origSendTime,
-                pRspMsg->testRequestRsp.respTime);
+        //ShowMessage(severity_levels::normal,"... 接收到测试请求的应答消息 (origSendTime[%s], respTime[%s])\n",
+         //       pRspMsg->testRequestRsp.origSendTime,
+          //      pRspMsg->testRequestRsp.respTime);
         break;
 
     case MDS_MSGTYPE_HEARTBEAT:
@@ -484,9 +484,9 @@ int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSess
         break;
 
     default:
-        ShowMessage(severity_levels::error,"无效的消息类型, 忽略之! msgId[0x%02X], server[%s:%d]",
-                pMsgHead->msgId, pSessionInfo->channel.remoteAddr,
-                pSessionInfo->channel.remotePort);
+        //ShowMessage(severity_levels::error,"无效的消息类型, 忽略之! msgId[0x%02X], server[%s:%d]",
+        //        pMsgHead->msgId, pSessionInfo->channel.remoteAddr,
+         //       pSessionInfo->channel.remotePort);
         return EFTYPE;
     }
 
@@ -498,11 +498,13 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg, 行情订阅成功!\n");
     //std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack = CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData;
 	//MarketDataCallBack mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
-	auto mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
+	//auto mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
+	
+	MarketDataCallBack = MdsApi_OnRtnDepthMarketData;
 	static const int32  THE_TIMEOUT_MS = 1000;
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-            mdcallback, NULL);
+            MarketDataCallBack, NULL);
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
             /* 执行超时检查 (检查会话是否已超时) */
