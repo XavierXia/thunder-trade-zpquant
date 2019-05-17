@@ -79,7 +79,8 @@ public:
 		MStrategy *, 
 		TMarketDataIdType,
 		const unordered_map<string, string> &,
-		boost::shared_mutex &);
+		boost::shared_mutex &,
+		atomic_uint_least64_t *);
 	virtual void MDDetachStrategy(MStrategy*/*IN*/);
 
 	virtual void MDHotUpdate(const ptree &);
