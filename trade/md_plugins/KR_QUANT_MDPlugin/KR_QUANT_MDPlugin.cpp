@@ -92,6 +92,8 @@ void CKrQuantMDPluginImp::MDInit(const ptree & in)
 	//读取配置
     cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
 
+    Start();
+
 	m_StartAndStopCtrlTimer.expires_from_now(time_duration(0,0,3,0));
 	m_StartAndStopCtrlTimer.async_wait(boost::bind(&CKrQuantMDPluginImp::TimerHandler,this));
 	m_futTimerThreadFuture=std::async([this] {
@@ -124,8 +126,7 @@ void CKrQuantMDPluginImp::TimerHandler()
 	else if (tid >= time_duration(7, 14, 0, 0) && tid < time_duration(12, 59, 0, 0))
 	{
 		if (true == m_boolIsOnline)
-			//Stop();
-			Start();
+			Stop();
 		nextActiveTime = ptime(second_clock::universal_time().date(), time_duration(12, 59, 30, 0));
 	}
 	else if (tid >= time_duration(12, 59, 0, 0) && tid < time_duration(18, 29, 0, 0))
@@ -137,8 +138,7 @@ void CKrQuantMDPluginImp::TimerHandler()
 	else if (tid >= time_duration(18, 29, 0, 0) && tid < time_duration(23, 59, 59, 0))
 	{
 		if (true == m_boolIsOnline)
-			//Stop();
-			Start();
+			Stop();
 		nextActiveTime = ptime(second_clock::universal_time().date()+days(1), time_duration(0, 0, 30, 0));
 	}
 	m_StartAndStopCtrlTimer.expires_at(nextActiveTime);
