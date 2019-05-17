@@ -88,6 +88,7 @@ void CKrQuantMDPluginImp::GetState(ptree & out)
 
 void CKrQuantMDPluginImp::MDInit(const ptree & in)
 {
+	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::MDInit!\n");
 	//读取配置
     cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
 
@@ -145,6 +146,8 @@ void CKrQuantMDPluginImp::TimerHandler()
 
 bool CKrQuantMDPluginImp::Start()
 {
+	ShowMessage(severity_levels::normal,"... MdsApi_InitAllByConvention,初始化客户端环境!\n");
+
 	m_uRequestID = 0;
 	m_boolIsOnline = false;
 
@@ -262,6 +265,8 @@ void CKrQuantMDPluginImp::ShowMessage(severity_levels lv, const char * fmt, ...)
 
 void CKrQuantMDPluginImp::MDAttachStrategy(MStrategy * strategy,TMarketDataIdType dataid,const unordered_map<string, string> & insConfig,boost::shared_mutex & mtx,atomic_uint_least64_t * updatetime)
 {
+	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::MDAttachStrategy!\n");
+	
 	boost::unique_lock<boost::shared_mutex> lg(m_mapObserverStructProtector);//Ð´Ëø
 
 	auto InstrumentID = insConfig.find("instrumentid")->second;
@@ -403,16 +408,22 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     switch (pMsgHead->msgId) {
     case MDS_MSGTYPE_L2_TRADE:
         /* 处理Level2逐笔成交消息 */
-        printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
-                pRspMsg->trade.exchId,
-                pRspMsg->trade.instrId);
+        // printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+        //         pRspMsg->trade.exchId,
+        //         pRspMsg->trade.instrId);
+        ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
+		                pRspMsg->trade.exchId,
+		                pRspMsg->trade.instrId);
         break;
 
     case MDS_MSGTYPE_L2_ORDER:
         /* 处理Level2逐笔委托消息 */
-        printf("... 接收到Level2逐笔委托消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
-                pRspMsg->order.exchId,
-                pRspMsg->order.instrId);
+        // printf("... 接收到Level2逐笔委托消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+        //         pRspMsg->order.exchId,
+        //         pRspMsg->order.instrId);
+        ShowMessage(severity_levels::normal,"... 接收到Level2逐笔委托消息 (exchId[%u], instrId[%d])\n",
+		                pRspMsg->trade.exchId,
+		                pRspMsg->trade.instrId);
         break;
 
     case MDS_MSGTYPE_L2_MARKET_DATA_SNAPSHOT:
@@ -422,7 +433,7 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     case MDS_MSGTYPE_L2_MARKET_OVERVIEW:
     case MDS_MSGTYPE_L2_VIRTUAL_AUCTION_PRICE:
         /* 处理Level2快照行情消息 */
-        printf("... 接收到Level2快照行情消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+        ShowMessage(severity_levels::normal,"... 接收到Level2快照行情消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->mktDataSnapshot.head.exchId,
                 pRspMsg->mktDataSnapshot.head.instrId);
         break;
@@ -431,21 +442,21 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     case MDS_MSGTYPE_OPTION_SNAPSHOT_FULL_REFRESH:
     case MDS_MSGTYPE_INDEX_SNAPSHOT_FULL_REFRESH:
         /* 处理Level1快照行情消息 */
-        printf("... 接收到Level1快照行情消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+        ShowMessage(severity_levels::normal,"... 接收到Level1快照行情消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->mktDataSnapshot.head.exchId,
                 pRspMsg->mktDataSnapshot.head.instrId);
         break;
 
     case MDS_MSGTYPE_SECURITY_STATUS:
         /* 处理(深圳)证券状态消息 */
-        printf("... 接收到(深圳)证券状态消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
+        ShowMessage(severity_levels::normal,"... 接收到(深圳)证券状态消息 (exchId[%u], instrId[%d])\n",
                 pRspMsg->securityStatus.exchId,
                 pRspMsg->securityStatus.instrId);
         break;
 
     case MDS_MSGTYPE_TRADING_SESSION_STATUS:
         /* 处理(上证)市场状态消息 */
-        printf("... 接收到(上证)市场状态消息 (exchId[%" __SPK_FMT_HH__ "u], TradingSessionID[%s])\n",
+        ShowMessage(severity_levels::normal,"... 接收到(上证)市场状态消息 (exchId[%u], TradingSessionID[%s])\n",
                 pRspMsg->trdSessionStatus.exchId,
                 pRspMsg->trdSessionStatus.TradingSessionID);
         break;
@@ -453,17 +464,17 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     case MDS_MSGTYPE_MARKET_DATA_REQUEST:
         /* 处理行情订阅请求的应答消息 */
         if (pMsgHead->status == 0) {
-            printf("... 行情订阅请求应答, 行情订阅成功!\n");
+            ShowMessage(severity_levels::normal,"... 行情订阅请求应答, 行情订阅成功!\n");
         } else {
-            printf("... 行情订阅请求应答, 行情订阅失败! " \
-                    "errCode[%02" __SPK_FMT_HH__ "u%02" __SPK_FMT_HH__ "u]\n",
+            ShowMessage(severity_levels::error,"... 行情订阅请求应答, 行情订阅失败! " \
+                    "errCode[%02u %02u]\n",
                     pMsgHead->status, pMsgHead->detailStatus);
         }
         break;
 
     case MDS_MSGTYPE_TEST_REQUEST:
         /* 处理测试请求的应答消息 */
-        printf("... 接收到测试请求的应答消息 (origSendTime[%s], respTime[%s])\n",
+        ShowMessage(severity_levels::normal,"... 接收到测试请求的应答消息 (origSendTime[%s], respTime[%s])\n",
                 pRspMsg->testRequestRsp.origSendTime,
                 pRspMsg->testRequestRsp.respTime);
         break;
@@ -473,7 +484,7 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         break;
 
     default:
-        printf("无效的消息类型, 忽略之! msgId[0x%02X], server[%s:%d]",
+        ShowMessage(severity_levels::error,"无效的消息类型, 忽略之! msgId[0x%02X], server[%s:%d]",
                 pMsgHead->msgId, pSessionInfo->channel.remoteAddr,
                 pSessionInfo->channel.remotePort);
         return EFTYPE;
@@ -484,6 +495,8 @@ static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
 
 void CKrQuantMDPluginImp::OnWaitOnMsg()
 {
+	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg, 行情订阅成功!\n");
+	
 	static const int32  THE_TIMEOUT_MS = 1000;
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
