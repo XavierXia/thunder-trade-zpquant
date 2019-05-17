@@ -398,7 +398,7 @@ BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChan
  * @param   pCallbackParams 外部传入的参数
  * @return  大于等于0，成功；小于0，失败（错误号）
  */
-static int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+int32 CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
 
