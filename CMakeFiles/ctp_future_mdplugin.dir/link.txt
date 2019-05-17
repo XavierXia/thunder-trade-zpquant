@@ -1,2 +1,0 @@
-/usr/bin/ar qc libctp_future_mdplugin.a  CMakeFiles/ctp_future_mdplugin.dir/trade/md_plugins/CTP_FUTURE_MDPlugin/CTP_FUTURE_MDPlugin.o
-/usr/bin/ranlib libctp_future_mdplugin.a
