@@ -412,8 +412,8 @@ MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         //         pRspMsg->trade.exchId,
         //         pRspMsg->trade.instrId);
         //ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
-		                pRspMsg->trade.exchId,
-		                pRspMsg->trade.instrId);
+		 //               pRspMsg->trade.exchId,
+		  //              pRspMsg->trade.instrId);
         break;
 
     case MDS_MSGTYPE_L2_ORDER:
@@ -422,8 +422,8 @@ MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         //         pRspMsg->order.exchId,
         //         pRspMsg->order.instrId);
         //ShowMessage(severity_levels::normal,"... 接收到Level2逐笔委托消息 (exchId[%u], instrId[%d])\n",
-		                pRspMsg->trade.exchId,
-		                pRspMsg->trade.instrId);
+		//                pRspMsg->trade.exchId,
+		//                pRspMsg->trade.instrId);
         break;
 
     case MDS_MSGTYPE_L2_MARKET_DATA_SNAPSHOT:
@@ -434,8 +434,8 @@ MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     case MDS_MSGTYPE_L2_VIRTUAL_AUCTION_PRICE:
         /* 处理Level2快照行情消息 */
         //ShowMessage(severity_levels::normal,"... 接收到Level2快照行情消息 (exchId[%u], instrId[%d])\n",
-                pRspMsg->mktDataSnapshot.head.exchId,
-                pRspMsg->mktDataSnapshot.head.instrId);
+        //        pRspMsg->mktDataSnapshot.head.exchId,
+         //       pRspMsg->mktDataSnapshot.head.instrId);
         break;
 
     case MDS_MSGTYPE_MARKET_DATA_SNAPSHOT_FULL_REFRESH:
@@ -443,22 +443,22 @@ MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     case MDS_MSGTYPE_INDEX_SNAPSHOT_FULL_REFRESH:
         /* 处理Level1快照行情消息 */
         //ShowMessage(severity_levels::normal,"... 接收到Level1快照行情消息 (exchId[%u], instrId[%d])\n",
-                pRspMsg->mktDataSnapshot.head.exchId,
-                pRspMsg->mktDataSnapshot.head.instrId);
+         //       pRspMsg->mktDataSnapshot.head.exchId,
+         //       pRspMsg->mktDataSnapshot.head.instrId);
         break;
 
     case MDS_MSGTYPE_SECURITY_STATUS:
         /* 处理(深圳)证券状态消息 */
         //ShowMessage(severity_levels::normal,"... 接收到(深圳)证券状态消息 (exchId[%u], instrId[%d])\n",
-                pRspMsg->securityStatus.exchId,
-                pRspMsg->securityStatus.instrId);
+         //       pRspMsg->securityStatus.exchId,
+         //       pRspMsg->securityStatus.instrId);
         break;
 
     case MDS_MSGTYPE_TRADING_SESSION_STATUS:
         /* 处理(上证)市场状态消息 */
         //ShowMessage(severity_levels::normal,"... 接收到(上证)市场状态消息 (exchId[%u], TradingSessionID[%s])\n",
-                pRspMsg->trdSessionStatus.exchId,
-                pRspMsg->trdSessionStatus.TradingSessionID);
+        //        pRspMsg->trdSessionStatus.exchId,
+        //        pRspMsg->trdSessionStatus.TradingSessionID);
         break;
 
     case MDS_MSGTYPE_MARKET_DATA_REQUEST:
