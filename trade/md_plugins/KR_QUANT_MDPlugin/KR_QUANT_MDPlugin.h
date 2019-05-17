@@ -91,6 +91,8 @@ public:
 	BOOL MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChannel,
         const char *pCodeListString);
 	void OnWaitOnMsg();
+	static int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+        SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 private:
 	bool Start();
