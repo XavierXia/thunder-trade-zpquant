@@ -5,7 +5,7 @@
 
 const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 extern char ProcessName[256];
-const char THE_CONFIG_FILE_NAME[100]="/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
+const char THE_CONFIG_FILE_NAME[100]="/root/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
 
 CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice),m_abIsPending(false), m_adbIsPauseed(false)
 {
