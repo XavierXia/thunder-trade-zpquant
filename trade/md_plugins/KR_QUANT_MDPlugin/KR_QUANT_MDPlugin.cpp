@@ -500,11 +500,11 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 	//MarketDataCallBack mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
 	//auto mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
 	
-	MarketDataCallBack = MdsApi_OnRtnDepthMarketData;
+	//MarketDataCallBack = MdsApi_OnRtnDepthMarketData;
 	static const int32  THE_TIMEOUT_MS = 1000;
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-            MarketDataCallBack, NULL);
+            MdsApi_OnRtnDepthMarketData, NULL);
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
             /* 执行超时检查 (检查会话是否已超时) */

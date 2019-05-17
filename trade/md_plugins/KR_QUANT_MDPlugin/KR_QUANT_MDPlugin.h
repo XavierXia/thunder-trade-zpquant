@@ -29,7 +29,7 @@ using namespace boost::gregorian;
 using namespace boost::asio;
 using namespace std;
 
-std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack; 
+//std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack; 
 
 class CKrQuantMDPluginImp:
 	public MAtmMarketDataPluginInterface
