@@ -510,6 +510,9 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
             MdsApi_OnRtnDepthMarketData, NULL);
+
+    ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg,[ret:%d]!\n",ret);
+
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
             /* 执行超时检查 (检查会话是否已超时) */
