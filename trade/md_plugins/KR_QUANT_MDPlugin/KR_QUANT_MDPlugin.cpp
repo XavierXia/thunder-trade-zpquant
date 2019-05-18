@@ -405,7 +405,8 @@ BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChan
  * @param   pCallbackParams 外部传入的参数
  * @return  大于等于0，成功；小于0，失败（错误号）
  */
-int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
+static __inline int32
+_MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
     /*
@@ -510,11 +511,11 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 	
 	//MarketDataCallBack = MdsApi_OnRtnDepthMarketData;
 	static const int32  THE_TIMEOUT_MS = 1000;
-	ShowMessage(severity_levels::normal,"... MdsApi_OnRtnDepthMarketData,[address:%p]!\n",&MdsApi_OnRtnDepthMarketData);
+	ShowMessage(severity_levels::normal,"... _MdsApi_OnRtnDepthMarketData,[address:%p]!\n",&_MdsApi_OnRtnDepthMarketData);
 
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-            MdsApi_OnRtnDepthMarketData, (void *)this);
+            _MdsApi_OnRtnDepthMarketData, (void *)this);
 
     ShowMessage(severity_levels::normal,"... MdsApi_WaitOnMsg,[ret:%d]!\n",ret);
 
