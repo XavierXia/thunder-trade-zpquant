@@ -426,19 +426,14 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         pStrMsg = (char *) pMsgBody;
     }
 
-    time_t sendDataCurrentTime = STime_GetSysTime();
+	const ptime now = microsec_clock::local_time();
+	const time_duration td = now.time_of_day();
+    
+    time_t sendDataCurrentTime = td.total_milliseconds();
     time_t GetLastRecvTime = MdsApi_GetLastRecvTime(pSessionInfo);
-
 
     if (pMsgHead->msgSize > 0) {
         pStrMsg[pMsgHead->msgSize - 1] = '\0';
-        // printf( "{" \
-        //         "\"msgType\":%" __SPK_FMT_HH__ "u, " \
-        //         "\"mktData\":%s" \
-        //         "}\n",
-        //         pMsgHead->msgId,
-        //         pStrMsg);
-
         sprintf(sendJsonDataStr,
                 "{" \
                 "\"msgType\":%" __SPK_FMT_HH__ "u, " \
