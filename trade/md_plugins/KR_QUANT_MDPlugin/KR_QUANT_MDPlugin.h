@@ -61,7 +61,7 @@ class CKrQuantMDPluginImp:
 	unordered_map<string, pair<CFutureTick,list< tuple < MStrategy*, TMarketDataIdType, boost::shared_mutex*> > > > m_mapInsid2Strategys;
 	unordered_map< MStrategy*, list<string> > m_mapStrategy2Insids;
 
-	MdsApiClientEnvT    cliEnv;
+	//MdsApiClientEnvT    cliEnv;
 
 public:
 	static const string s_strAccountKeyword;

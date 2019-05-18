@@ -6,6 +6,8 @@
 const string CKrQuantMDPluginImp::s_strAccountKeyword="serveraddress;username;";
 extern char ProcessName[256];
 const char THE_CONFIG_FILE_NAME[100]="/root/thunder-trade-zpquant/third/Kr360Quant/conf/mds_client.conf";
+	//读取配置
+MdsApiClientEnvT cliEnv = {NULLOBJ_MDSAPI_CLIENT_ENV};
 
 CKrQuantMDPluginImp::CKrQuantMDPluginImp():m_StartAndStopCtrlTimer(m_IOservice),m_abIsPending(false), m_adbIsPauseed(false)
 {
@@ -513,7 +515,7 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
             MdsApi_OnRtnDepthMarketData, NULL);
 
-    ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg,[ret:%d]!\n",ret);
+    ShowMessage(severity_levels::normal,"... MdsApi_WaitOnMsg,[ret:%d]!\n",ret);
 
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
