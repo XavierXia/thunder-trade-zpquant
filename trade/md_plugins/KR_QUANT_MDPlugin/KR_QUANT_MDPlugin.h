@@ -31,7 +31,7 @@ using namespace boost::asio;
 using namespace std;
 
 //std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack; 
-extern "C" int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
+int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 
 class CKrQuantMDPluginImp:

@@ -148,8 +148,6 @@ void CKrQuantMDPluginImp::TimerHandler()
 
 bool CKrQuantMDPluginImp::Start()
 {
-	ShowMessage(severity_levels::normal,"... MdsApi_InitAllByConvention,初始化客户端环境!\n");
-
 	m_uRequestID = 0;
 	m_boolIsOnline = false;
 
@@ -159,6 +157,8 @@ bool CKrQuantMDPluginImp::Start()
     	ShowMessage(severity_levels::error, "kr_mds:MdsApi_InitAllByConvention failed.");
         return false;
     }
+
+    ShowMessage(severity_levels::normal,"... MdsApi_InitAllByConvention,初始化客户端环境,成功!\n");
 
     //test
     OnWaitOnMsg();
@@ -507,26 +507,31 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 	
 	//MarketDataCallBack = MdsApi_OnRtnDepthMarketData;
 	static const int32  THE_TIMEOUT_MS = 1000;
-	while(1)
-	{
-	    /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
-	    int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-	            MdsApi_OnRtnDepthMarketData, NULL);
+	ShowMessage(severity_levels::normal,"... MdsApi_OnRtnDepthMarketData,[address:%p]!\n",&MdsApi_OnRtnDepthMarketData);
 
-	    ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg,[ret:%d]!\n",ret);
+    /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
+    int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
+            MdsApi_OnRtnDepthMarketData, NULL);
 
-	    if (unlikely(ret < 0)) {
-	        if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
-	            /* 执行超时检查 (检查会话是否已超时) */
-	            continue;
-	        }
+    ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg,[ret:%d]!\n",ret);
 
-	        if (SPK_IS_NEG_EPIPE(ret)) {
-	            /* 连接已断开 */
-	        }
-	        MDDestoryAll();
-	    }
-	}
+    if (unlikely(ret < 0)) {
+        if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
+            /* 执行超时检查 (检查会话是否已超时) */
+            continue;
+        }
+
+        if (SPK_IS_NEG_EPIPE(ret)) {
+            /* 连接已断开 */
+        }
+        MDDestoryAll();
+    }
+
+    while(1)
+    {
+    	sleep(100);
+    }
+
 }
 
 
