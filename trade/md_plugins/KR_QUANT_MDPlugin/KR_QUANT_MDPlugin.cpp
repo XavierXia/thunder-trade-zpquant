@@ -414,6 +414,8 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
 
+    ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"... MdsApi_OnRtnDepthMarketData 接收到消息)\n");
+
     char encodeBuf[8192] = {0};
     char *pStrMsg = (char *) NULL;
     char sendJsonDataStr[4096];
@@ -433,7 +435,7 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     
     time_t sendDataCurrentTime = td.total_milliseconds();
     time_t GetLastRecvTime = MdsApi_GetLastRecvTime(pSessionInfo);
-    ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"%ld\n",sendDataCurrentTime);
+    ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"... sendDataCurrentTime:%ld\n",sendDataCurrentTime);
 
     if (pMsgHead->msgSize > 0) {
         pStrMsg[pMsgHead->msgSize - 1] = '\0';
@@ -467,8 +469,6 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     /*
      * 根据消息类型对行情消息进行处理
      */
-        ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"... MdsApi_OnRtnDepthMarketData 接收到消息)\n");
-
     switch (pMsgHead->msgId) {
     case MDS_MSGTYPE_L2_TRADE:
         /* 处理Level2逐笔成交消息 */
