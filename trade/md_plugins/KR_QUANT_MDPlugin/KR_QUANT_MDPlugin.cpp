@@ -441,9 +441,9 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         pStrMsg[pMsgHead->msgSize - 1] = '\0';
         sprintf(sendJsonDataStr,
                 "{" \
-                "\"msgType\":%u, " \
-                "\"sendDCT\":%l, " \
-                "\"LastRecvT\":%l, " \
+                "\"msgType\":%" __SPK_FMT_HH__ "u, " \
+                "\"sendDCT\":%ld, " \
+                "\"LastRecvT\":%ld, " \
                 "\"mktData\":%s" \
                 "}\n",
                 pMsgHead->msgId,
@@ -455,7 +455,7 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     {
         sprintf(sendJsonDataStr,
                 "{" \
-                "\"msgType\":%u, " \
+                "\"msgType\":%" __SPK_FMT_HH__ "u, " \
                 "\"sendDCT\":%ld, " \
                 "\"LastRecvT\":%ld, " \
                 "\"mktData\":{}" \
