@@ -518,7 +518,7 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
     if (unlikely(ret < 0)) {
         if (likely(SPK_IS_NEG_ETIMEDOUT(ret))) {
             /* 执行超时检查 (检查会话是否已超时) */
-            continue;
+            ;
         }
 
         if (SPK_IS_NEG_EPIPE(ret)) {
