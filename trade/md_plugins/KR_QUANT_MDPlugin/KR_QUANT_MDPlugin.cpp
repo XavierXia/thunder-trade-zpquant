@@ -500,7 +500,7 @@ int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
 
 void CKrQuantMDPluginImp::OnWaitOnMsg()
 {
-	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg, 行情订阅成功!\n");
+	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg!\n");
     //std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack = CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData;
 	//MarketDataCallBack mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
 	//auto mdcallback = std::bind(&CKrQuantMDPluginImp::MdsApi_OnRtnDepthMarketData,this,_1,_2,_3,_4);
@@ -520,6 +520,15 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
             /* 连接已断开 */
         }
         MDDestoryAll();
+    }
+    else
+    {
+    	ShowMessage(severity_levels::normal,"... CKrQuantMDPluginImp::OnWaitOnMsg,行情订阅成功!\n");
+    }
+
+    while(1)
+    {
+        sleep(100);
     }
 }
 
