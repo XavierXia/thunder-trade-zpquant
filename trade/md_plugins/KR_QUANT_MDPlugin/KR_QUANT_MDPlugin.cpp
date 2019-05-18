@@ -411,6 +411,8 @@ int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     /*
      * 根据消息类型对行情消息进行处理
      */
+        ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"... MdsApi_OnRtnDepthMarketData 接收到消息)\n");
+
     switch (pMsgHead->msgId) {
     case MDS_MSGTYPE_L2_TRADE:
         /* 处理Level2逐笔成交消息 */
