@@ -594,11 +594,10 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
         MDDestoryAll();
     }
 
-    while(1)
-    {
-    	sleep(100);
-    }
-
+    // while(1)
+    // {
+    // 	sleep(100);
+    // }
 }
 
 
