@@ -165,12 +165,14 @@ bool CKrQuantMDPluginImp::Start()
     //test
     OnWaitOnMsg();
 
-	std::unique_lock<std::mutex> lk(m_mtxLoginSignal);
-	m_cvLoginSignalCV.wait_for(lk,std::chrono::seconds(10));
-	if (m_boolIsOnline)
-		return true;
-	else
-		return false;
+	// std::unique_lock<std::mutex> lk(m_mtxLoginSignal);
+	// m_cvLoginSignalCV.wait_for(lk,std::chrono::seconds(10));
+	// if (m_boolIsOnline)
+	// 	return true;
+	// else
+	// 	return false;
+
+	return true;
 }
 
 void CKrQuantMDPluginImp::Stop()
