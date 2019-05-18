@@ -13,11 +13,12 @@
 #include <tuple>
 #include <boost/log/common.hpp>
 
-
+extern "C" {
 #include "mds_api/mds_api.h"
 #include "mds_api/parser/mds_protocol_parser.h"
 #include "mds_api/parser/json_parser/mds_json_parser.h"
 #include "sutil/logger/spk_log.h"
+}
 
 #include "SeverityLevel.h"
 #include "FutureTick.h"
@@ -30,7 +31,7 @@ using namespace boost::asio;
 using namespace std;
 
 //std::function<int32(MdsApiSessionInfoT *,SMsgHeadT *,void *,void *)> MarketDataCallBack; 
-int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
+extern "C" int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
 
 
 class CKrQuantMDPluginImp:
