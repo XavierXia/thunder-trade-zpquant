@@ -99,11 +99,11 @@ public:
 	void OnWaitOnMsg();
 	//int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     //    SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams);
+    void ShowMessage(severity_levels,const char * fmt, ...);
 
 private:
 	bool Start();
 	void Stop();
-	void ShowMessage(severity_levels,const char * fmt, ...);
 	void TimerHandler();
 	void OnError();
 };
