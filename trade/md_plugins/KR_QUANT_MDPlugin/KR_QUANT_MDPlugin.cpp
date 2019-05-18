@@ -408,7 +408,6 @@ BOOL CKrQuantMDPluginImp::MDResubscribeByCodePrefix(MdsApiSessionInfoT *pTcpChan
 int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         SMsgHeadT *pMsgHead, void *pMsgBody, void *pCallbackParams) {
     MdsMktRspMsgBodyT   *pRspMsg = (MdsMktRspMsgBodyT *) pMsgBody;
-
     /*
      * 根据消息类型对行情消息进行处理
      */
@@ -418,9 +417,9 @@ int32 MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
         // printf("... 接收到Level2逐笔成交消息 (exchId[%" __SPK_FMT_HH__ "u], instrId[%d])\n",
         //         pRspMsg->trade.exchId,
         //         pRspMsg->trade.instrId);
-        //ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
-		 //               pRspMsg->trade.exchId,
-		  //              pRspMsg->trade.instrId);
+        ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"... 接收到Level2逐笔成交消息 (exchId[%u], instrId[%d])\n",
+		                pRspMsg->trade.exchId,
+		               pRspMsg->trade.instrId);
         break;
 
     case MDS_MSGTYPE_L2_ORDER:
@@ -513,7 +512,7 @@ void CKrQuantMDPluginImp::OnWaitOnMsg()
 
     /* 等待行情消息到达, 并通过回调函数对消息进行处理 */
     int ret = MdsApi_WaitOnMsg(&cliEnv.tcpChannel, THE_TIMEOUT_MS,
-            MdsApi_OnRtnDepthMarketData, NULL);
+            MdsApi_OnRtnDepthMarketData, (void *)this);
 
     ShowMessage(severity_levels::normal,"... MdsApi_WaitOnMsg,[ret:%d]!\n",ret);
 
