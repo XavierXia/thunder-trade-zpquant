@@ -431,12 +431,13 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     
     time_t sendDataCurrentTime = td.total_milliseconds();
     time_t GetLastRecvTime = MdsApi_GetLastRecvTime(pSessionInfo);
+    ((CKrQuantMDPluginImp *) pCallbackParams) -> ShowMessage(severity_levels::normal,"%ld\n",sendDataCurrentTime);
 
     if (pMsgHead->msgSize > 0) {
         pStrMsg[pMsgHead->msgSize - 1] = '\0';
         sprintf(sendJsonDataStr,
                 "{" \
-                "\"msgType\":%" __SPK_FMT_HH__ "u, " \
+                "\"msgType\":%u, " \
                 "\"sendDCT\":%l, " \
                 "\"LastRecvT\":%l, " \
                 "\"mktData\":%s" \
@@ -450,7 +451,7 @@ _MdsApi_OnRtnDepthMarketData(MdsApiSessionInfoT *pSessionInfo,
     {
         sprintf(sendJsonDataStr,
                 "{" \
-                "\"msgType\":%" __SPK_FMT_HH__ "u, " \
+                "\"msgType\":%u, " \
                 "\"sendDCT\":%ld, " \
                 "\"LastRecvT\":%ld, " \
                 "\"mktData\":{}" \
